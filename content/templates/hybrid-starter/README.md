@@ -7,7 +7,7 @@ The code is split into the three QIDEA lanes:
 
 | Lane | Folder | Role |
 |---|---|---|
-| Quantum | `quantum/` | The parameterised circuit (ansatz) and the Hamiltonian |
+| Quantum | `quantum/` | The parameterised circuit (ansatz), the Hamiltonian, and a Bell-state example |
 | Classical | `classical/` | The optimiser that tunes the circuit parameters |
 | Integration | `integration/` | The loop that connects both sides |
 

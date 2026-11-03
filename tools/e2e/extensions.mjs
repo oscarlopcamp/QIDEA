@@ -21,7 +21,9 @@ const palette = page.getByRole('combobox')
 const runCommand = async (text) => {
   await page.keyboard.press('ControlOrMeta+Shift+P')
   await palette.fill(`>${text}`)
-  await page.keyboard.press('Enter')
+  await page.getByRole('option').first().waitFor()
+  await palette.press('Enter')
+  await palette.waitFor({ state: 'detached', timeout: 3000 }).catch(() => console.log('  (palette still open after Enter)'))
 }
 
 await page.goto(url)
@@ -29,7 +31,7 @@ await page.goto(url)
 // Extensions view lists all built-ins, all active.
 await page.getByRole('button', { name: 'Extensions' }).click()
 const lead = await page.getByText(/extensions installed/).innerText()
-check('extensions view lists built-ins', /^8 extensions installed/.test(lead), lead)
+check('extensions view lists built-ins', /^9 extensions installed/.test(lead), lead)
 check('no extension failed', !(await page.getByLabel('Failed to activate').count()))
 if (shots) await page.screenshot({ path: `${shots}/ext-view.png` })
 
@@ -77,10 +79,11 @@ check('Ctrl/Cmd+P opens a file', await visible(page.getByRole('tab', { name: 'ha
 const log = page.getByRole('log')
 await page.keyboard.press('ControlOrMeta+J')
 await page.waitForTimeout(300)
-const hidden = !(await log.isVisible())
+await page.getByRole('tab', { name: 'Output' }).click().catch(() => {})
+const hidden = !(await page.getByRole('tablist', { name: 'Panel' }).isVisible())
 await page.keyboard.press('ControlOrMeta+J')
 await page.waitForTimeout(300)
-check('Ctrl/Cmd+J hides and shows the output panel', hidden && (await log.isVisible()))
+check('Ctrl/Cmd+J hides and shows the output panel', hidden && (await page.getByRole('tablist', { name: 'Panel' }).isVisible()))
 
 // Qiskit version quick pick (from an extension, via ctx.ui.showQuickPick).
 await page.getByRole('button', { name: /^Qiskit version/ }).click()
@@ -94,7 +97,8 @@ check('picking a version updates the status bar', await visible(page.getByRole('
 await page.getByRole('tab', { name: 'main.py' }).click()
 await page.locator('.monaco-editor textarea').first().focus()
 await page.keyboard.press('ControlOrMeta+Enter')
-await page.locator('[role=log] pre').filter({ hasText: /^(Finished in \d+ ms|Traceback)/ }).last().waitFor({ timeout: 240000 })
+await page.locator('[role=log] pre').filter({ hasText: /^(Finished in \d+ ms|Traceback)/ }).last().waitFor({ state: 'attached', timeout: 240000 })
+await page.getByRole('tab', { name: 'Output' }).click()
 const out = await log.innerText()
 check('Ctrl/Cmd+Enter in the editor runs the file on Qiskit 2.5.2', /VQE energy/.test(out) && /qiskit 2\.5\.2/.test(out))
 

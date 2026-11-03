@@ -3,6 +3,7 @@ import { languagesExtension } from './languages'
 import { genericMethodologyExtension } from './methodologyGeneric'
 import { learnExtension, lifecycleExtension, projectManagerExtension } from './plannedModules'
 import { pythonRuntimeExtension } from './pythonRuntime'
+import { simulatorExtension } from './simulator'
 import { templatesExtension } from './templates'
 import { workbenchExtension } from './workbench'
 
@@ -11,6 +12,7 @@ export const BUILTIN_EXTENSIONS: QideaExtension[] = [
   workbenchExtension,
   languagesExtension,
   pythonRuntimeExtension,
+  simulatorExtension,
   templatesExtension,
   genericMethodologyExtension,
   projectManagerExtension,

@@ -1,13 +1,14 @@
 import { useEffect } from 'react'
 import { Cpu, LoaderCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { host } from '@/extensions'
+import { host, useContributions } from '@/extensions'
 import { useRuntime } from '@/stores/runtime'
 import { QideaMark } from '@/ui/brand/Logo'
 
 export function StatusBar() {
   const { t } = useTranslation()
   const { selected, loadedVersion, phase, progress, init } = useRuntime()
+  const backend = useContributions('backends')[0]
 
   useEffect(() => {
     void init()
@@ -35,7 +36,7 @@ export function StatusBar() {
       </button>
       <span className="flex items-center gap-1.5">
         <Cpu size={13} strokeWidth={1.75} />
-        {t('status.backend')}
+        {backend?.name ?? t('status.noBackend')}
       </span>
       <span className="ml-auto">v{__APP_VERSION__}</span>
     </footer>

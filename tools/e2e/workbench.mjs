@@ -20,7 +20,8 @@ const check = (name, ok, extra = '') => {
 }
 // The run summary line (green "Finished in" or a red error) is always the last thing printed.
 const waitRun = async () => {
-  await page.locator('[role=log] pre').filter({ hasText: /^(Finished in \d+ ms|Traceback|PythonError)/ }).last().waitFor({ timeout: 240000 })
+  await page.locator('[role=log] pre').filter({ hasText: /^(Finished in \d+ ms|Traceback|PythonError)/ }).last().waitFor({ state: 'attached', timeout: 240000 })
+  await page.getByRole('tab', { name: 'Output' }).click()
   return log.innerText()
 }
 

@@ -2,6 +2,11 @@
 import type { PyodideAPI } from 'pyodide'
 import type { RuntimeLock } from '@/services/runtimes/types'
 import type { WorkerRequest, WorkerResponse } from './protocol'
+import { parseQasm2 } from '@/core/quantum/qasm2'
+import { MAX_QUBITS, probabilitiesDict } from '@/core/quantum/simulate'
+import { runQasmSync } from '@/services/backends/LocalSimulatorBackend'
+import type { Visual } from '@/services/runtimes/types'
+import QIDEA_PY from './python/qidea.py?raw'
 import { PROJECT_DIR, cleanTraceback } from './traceback'
 
 declare const self: DedicatedWorkerGlobalScope
@@ -27,6 +32,8 @@ for name in ("qiskit", "rustworkx", "numpy", "scipy", "dill", "stevedore", "symp
         pkgs[name] = md.version(name)
     except md.PackageNotFoundError:
         pass
+import qidea
+pkgs["qidea"] = qidea.__version__
 json.dumps({"python": sys.version.split()[0], "packages": pkgs})
 `
 
@@ -71,7 +78,8 @@ async function load(msg: Extract<WorkerRequest, { type: 'load' }>): Promise<Runt
   micropip.destroy()
 
   progress('Importing qiskit…')
-  await py.runPythonAsync('import qiskit')
+  installQidea(py)
+  await py.runPythonAsync('import qiskit, qidea\nqidea._install_qiskit_hooks()')
   const info = JSON.parse(await py.runPythonAsync(LOCK_PY)) as Omit<RuntimeLock, 'pyodide'>
   lock = { pyodide: py.version, ...info }
   loadedVersion = msg.qiskitVersion
@@ -97,6 +105,29 @@ if root not in sys.path:
 import importlib
 importlib.invalidate_caches()
 `
+
+const QIDEA_LIB = '/home/pyodide/qidea_lib'
+
+/**
+ * Install the `qidea` Python package and its native bridge. The bridge runs QIDEA's
+ * TypeScript simulator inside this worker, so Python calls it synchronously.
+ */
+function installQidea(py: PyodideAPI) {
+  py.registerJsModule('_qidea_native', {
+    max_qubits: () => MAX_QUBITS,
+    run_qasm: (qasm: string, shots: number, seed: number) =>
+      JSON.stringify(runQasmSync(qasm, { shots, seed: seed < 0 ? undefined : seed })),
+    /** Exact probabilities (no sampling). Internal: used to cross-check against Qiskit. */
+    probabilities: (qasm: string) => JSON.stringify(probabilitiesDict(parseQasm2(qasm))),
+    emit: (kind: string, json: string) => {
+      const visual = { kind, ...JSON.parse(json) } as Visual
+      post({ id: currentId, type: 'event', event: { type: 'visual', visual } })
+    },
+  })
+  py.FS.mkdirTree(QIDEA_LIB)
+  py.FS.writeFile(`${QIDEA_LIB}/qidea.py`, QIDEA_PY)
+  py.runPython(`import sys\nif ${JSON.stringify(QIDEA_LIB)} not in sys.path: sys.path.append(${JSON.stringify(QIDEA_LIB)})`)
+}
 
 async function run(files: Record<string, string>, entry: string) {
   if (!py || !lock) throw new Error('No runtime loaded')

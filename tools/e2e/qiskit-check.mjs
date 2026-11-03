@@ -27,8 +27,10 @@ for (const v of Object.keys(versions)) {
   await page.getByRole('button', { name: 'Clear output' }).click()
   const t0 = Date.now()
   await page.getByRole('button', { name: 'Run Qiskit check' }).click()
-  const done = page.getByText(/^(Finished in|Error|Traceback|Could not|Checksum)/).first()
-  await done.waitFor({ timeout: 240000 })
+  const done = page.locator('[role=log] pre').filter({ hasText: /^(Finished in|Error|Traceback|Could not|Checksum)/ }).first()
+  await done.waitFor({ state: 'attached', timeout: 240000 })
+  // The check also draws results, which brings the Results tab forward: read the text output.
+  await page.getByRole('tab', { name: 'Output' }).click()
   const log = await page.getByRole('log').innerText()
   const counts = log.match(/Counts: (.*)/)?.[1]
   const runtime = log.match(/Runtime: (.*)/)?.[1]

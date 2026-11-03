@@ -30,20 +30,21 @@
   },
   "panel": {
     "output": "Output",
-    "terminal": "Terminal",
     "ready": "QIDEA is ready. Run the Qiskit check to load Python and Qiskit in your browser.",
     "runCheck": "Run Qiskit check",
     "loadingRuntime": "Loading Qiskit…",
-    "clear": "Clear output"
+    "clear": "Clear output",
+    "tabs": "Panel",
+    "results": "Results"
   },
   "status": {
     "runtime": "Qiskit version",
     "notLoaded": "not loaded",
     "loading": "loading…",
     "ready": "ready",
-    "backend": "Local simulator",
     "themeToDark": "Switch to dark theme",
-    "themeToLight": "Switch to light theme"
+    "themeToLight": "Switch to light theme",
+    "noBackend": "No backend"
   },
   "common": {
     "cancel": "Cancel",
@@ -195,5 +196,23 @@
       "title": "Maintenance",
       "description": "Keep runtimes, backends and code up to date."
     }
+  },
+  "results": {
+    "empty": "Charts and circuit diagrams from your code appear here. Use QIDEA's helpers, or Qiskit's plot_histogram() and qc.draw(\"mpl\").",
+    "shots_one": "{{formatted}} shot",
+    "shots_other": "{{formatted}} shots",
+    "outcomes_one": "{{count}} outcome",
+    "outcomes_other": "{{count}} outcomes",
+    "showTable": "Show as table",
+    "showChart": "Show as chart",
+    "outcome": "Outcome",
+    "count": "Count",
+    "probability": "Probability",
+    "tooltip": "{{count}} shots ({{pct}})",
+    "other_one": "{{count}} other",
+    "other_other": "{{count}} others",
+    "histogramSummary_one": "Histogram of {{shots}} shots over {{count}} outcome. Most frequent: {{top}}.",
+    "histogramSummary_other": "Histogram of {{shots}} shots over {{count}} outcomes. Most frequent: {{top}}.",
+    "circuitSummary": "Circuit diagram with {{qubits}} qubits and {{ops}} operations."
   }
 }

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Group, Panel, Separator, usePanelRef } from 'react-resizable-panels'
 import { host } from '@/extensions'
 import { matchesKeybinding } from '@/extensions/keybindings'
+import { useRuntime } from '@/stores/runtime'
 import { useUi } from '@/stores/ui'
 import { Toasts } from '@/ui/common/Toasts'
 import { CommandPalette } from '@/ui/palette/CommandPalette'
@@ -46,6 +47,15 @@ export function Workbench() {
     window.addEventListener('keydown', onKey, true)
     return () => window.removeEventListener('keydown', onKey, true)
   }, [])
+
+  // Results need room: when they arrive, grow a short panel (never shrink one the user enlarged).
+  const panelTab = useRuntime((s) => s.panelTab)
+  useEffect(() => {
+    const p = panelRef.current
+    if (panelTab !== 'results' || !p) return
+    if (p.isCollapsed()) p.expand()
+    if (p.getSize().inPixels < 360) p.resize(380)
+  }, [panelTab, panelRef])
 
   // Keep the bottom panel in sync with the store (commands toggle it; users can drag it closed).
   useEffect(() => {

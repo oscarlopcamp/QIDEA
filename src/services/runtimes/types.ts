@@ -32,10 +32,24 @@ export interface RuntimeLock {
 
 export type RuntimePhase = 'idle' | 'loading' | 'ready' | 'running' | 'error'
 
+/** Structured output from user code (qidea.show_counts, show_circuit, plot_histogram, ...). */
+export type Visual =
+  | { kind: 'histogram'; title: string; counts: Record<string, number> }
+  | { kind: 'circuit'; title: string; circuit: CircuitView }
+
+/** A circuit as reported by Qiskit (high-level gates, parameters may be symbolic). */
+export interface CircuitView {
+  name: string
+  qubits: string[]
+  clbits: string[]
+  ops: { name: string; qubits: number[]; clbits: number[]; params: (number | string)[] }[]
+}
+
 export type RuntimeEvent =
   | { type: 'progress'; message: string }
   | { type: 'stdout'; text: string }
   | { type: 'stderr'; text: string }
+  | { type: 'visual'; visual: Visual }
 
 export interface RunOutcome {
   ok: boolean

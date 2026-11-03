@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { host } from '@/extensions'
 import { BELL_CHECK } from '@/services/runtimes/samples'
-import type { RuntimeEvent, RuntimeLock, RuntimePhase, RuntimeProvider } from '@/services/runtimes/types'
+import type { RuntimeEvent, RuntimeLock, RuntimePhase, RuntimeProvider, Visual } from '@/services/runtimes/types'
 
 export type OutputKind = 'info' | 'stdout' | 'stderr' | 'error' | 'success'
 export interface OutputLine {
@@ -19,7 +19,20 @@ function runtime(): RuntimeProvider {
 }
 let lineId = 0
 
+export interface ResultItem {
+  id: number
+  /** File that produced it. */
+  entry: string
+  visual: Visual
+}
+
+export type PanelTab = 'output' | 'results'
+
 interface RuntimeState {
+  /** Visual results of the latest run. */
+  results: ResultItem[]
+  panelTab: PanelTab
+  setPanelTab: (tab: PanelTab) => void
   phase: RuntimePhase
   versions: string[]
   selected: string | null
@@ -40,10 +53,17 @@ export const useRuntime = create<RuntimeState>((set, get) => {
   const print = (kind: OutputKind, text: string) =>
     set((s) => ({ output: [...s.output, { id: lineId++, kind, text }] }))
 
+  let currentEntry = ''
   const onEvent = (e: RuntimeEvent) => {
     if (e.type === 'progress') {
       set({ progress: e.message })
       print('info', e.message)
+    } else if (e.type === 'visual') {
+      // The first result of a run brings the Results tab forward.
+      set((s) => ({
+        results: [...s.results, { id: lineId++, entry: currentEntry, visual: e.visual }],
+        panelTab: s.results.length === 0 ? 'results' : s.panelTab,
+      }))
     } else print(e.type, e.text)
   }
 
@@ -55,6 +75,9 @@ export const useRuntime = create<RuntimeState>((set, get) => {
     lock: null,
     progress: null,
     output: [],
+    results: [],
+    panelTab: 'output',
+    setPanelTab: (tab) => set({ panelTab: tab }),
 
     init: async () => {
       try {
@@ -91,7 +114,8 @@ export const useRuntime = create<RuntimeState>((set, get) => {
     runFiles: async (files, entry) => {
       if (get().phase === 'running') return
       if (!(await get().ensureLoaded())) return
-      set({ phase: 'running' })
+      currentEntry = entry
+      set({ phase: 'running', results: [], panelTab: 'output' })
       print('info', `$ python ${entry}`)
       try {
         const outcome = await runtime().run(files, entry, onEvent)
