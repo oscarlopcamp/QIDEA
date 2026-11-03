@@ -31,11 +31,16 @@
   "panel": {
     "output": "Output",
     "terminal": "Terminal",
-    "ready": "QIDEA is ready. Runs and logs will appear here."
+    "ready": "QIDEA is ready. Run the Qiskit check to load Python and Qiskit in your browser.",
+    "runCheck": "Run Qiskit check",
+    "loadingRuntime": "Loading Qiskit…",
+    "clear": "Clear output"
   },
   "status": {
-    "runtime": "Qiskit runtime",
-    "runtimeNotLoaded": "Qiskit · not loaded",
+    "runtime": "Qiskit version",
+    "notLoaded": "not loaded",
+    "loading": "loading…",
+    "ready": "ready",
     "backend": "Local simulator",
     "themeToDark": "Switch to dark theme",
     "themeToLight": "Switch to light theme"

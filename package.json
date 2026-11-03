@@ -8,7 +8,10 @@
     "build": "tsc -p . && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "preview:pages": "VITE_BASE=/qidea/ npm run build && VITE_BASE=/qidea/ vite preview",
+    "test:e2e": "node tools/e2e/qiskit-check.mjs",
+    "wheels": "tools/wheels/build.sh"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
@@ -27,6 +30,8 @@
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^6.2.1",
+    "playwright-core": "^1.64.1",
+    "pyodide": "^314.0.7",
     "tailwindcss": "^4.3.4",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",

@@ -1,0 +1,20 @@
+{
+  "qiskit": "2.6.1",
+  "wheels": [
+    "stevedore-5.9.1-py3-none-any.whl",
+    "dill-0.4.1-py3-none-any.whl",
+    "rustworkx-0.18.1-cp310-abi3-pyemscripten_2026_0_wasm32.whl",
+    "qiskit-2.6.1-cp310-abi3-pyemscripten_2026_0_wasm32.whl"
+  ],
+  "pyodidePackages": {
+    "numpy": "2.4.6",
+    "scipy": "1.18.0",
+    "typing-extensions": "4.15.0"
+  },
+  "sha256": {
+    "stevedore-5.9.1-py3-none-any.whl": "5c8ff3a9f336cc1a06ac0f597bc79d11a2f950bfd32e290ca56b5a301fafafbf",
+    "dill-0.4.1-py3-none-any.whl": "1e1ce33e978ae97fcfcff5638477032b801c46c7c65cf717f95fbc2248f79a9d",
+    "rustworkx-0.18.1-cp310-abi3-pyemscripten_2026_0_wasm32.whl": "67dcdfcc3dfc8262f7627d2b3ae85ac74de1b1dcababf637a1116444c4adb621",
+    "qiskit-2.6.1-cp310-abi3-pyemscripten_2026_0_wasm32.whl": "7a5db862eb535fd7b7b70c7b7ff4e7172b0c4200409d5f443d2879a127006284"
+  }
+}
