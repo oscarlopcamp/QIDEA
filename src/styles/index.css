@@ -1,0 +1,108 @@
+@import 'tailwindcss';
+@import '@fontsource/instrument-sans/400.css';
+@import '@fontsource/instrument-sans/500.css';
+@import '@fontsource/instrument-sans/600.css';
+@import '@fontsource-variable/jetbrains-mono';
+
+/*
+  QIDEA design tokens.
+  Base: deep indigo ("the lab at night") / cool paper in light mode.
+  Accent: qubit amber — the Bloch-vector colour of the logo.
+  Lane colours carry meaning across the whole app:
+    classical = slate blue, quantum = amber, integration = teal.
+*/
+:root,
+[data-theme='dark'] {
+  --bg: #161a33;
+  --surface: #1d2142;
+  --surface-2: #252a52;
+  --line: #2f3563;
+  --text: #ecebf7;
+  --muted: #9a9cc0;
+  --accent: #f2b544;
+  --accent-ink: #1a1405;
+  --lane-classical: #7b97ff;
+  --lane-quantum: #f2b544;
+  --lane-integration: #3cc6b4;
+  --danger: #ff6b7a;
+  --focus: #f2b544;
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg: #f3f4fa;
+  --surface: #ffffff;
+  --surface-2: #e9ebf5;
+  --line: #d4d7ea;
+  --text: #1a1d38;
+  --muted: #5d6188;
+  --accent: #b27508;
+  --accent-ink: #ffffff;
+  --lane-classical: #3a5bd9;
+  --lane-quantum: #b27508;
+  --lane-integration: #0f8a7b;
+  --danger: #c62839;
+  --focus: #3a5bd9;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-classical: var(--lane-classical);
+  --color-quantum: var(--lane-quantum);
+  --color-integration: var(--lane-integration);
+  --color-danger: var(--danger);
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Logo: the Bloch vector settles into place once, on first load. */
+@keyframes qidea-vector-in {
+  from {
+    transform: rotate(-200deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+.qidea-vector-animate {
+  transform-origin: 15px 14.5px;
+  animation: qidea-vector-in 1.1s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}

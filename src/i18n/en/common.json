@@ -1,0 +1,43 @@
+{
+  "views": {
+    "explorer": "Explorer",
+    "manager": "Project manager",
+    "learn": "Learn",
+    "lifecycle": "Test & deploy",
+    "extensions": "Extensions"
+  },
+  "sidebar": {
+    "explorerEmpty": "No project open yet. Create one from the welcome page.",
+    "managerEmpty": "The project manager shows every stage of your hybrid project across the classical, quantum and integration lanes.",
+    "learnEmpty": "Lessons on qubits, entanglement and hybrid algorithms will appear here.",
+    "lifecycleEmpty": "Run tests, validate results and package your project for deployment.",
+    "extensionsEmpty": "Built-in extensions: simulator, Python runtime, lessons and methodology templates."
+  },
+  "welcome": {
+    "title": "Have a quantum idea? Build it here.",
+    "lead": "Write Qiskit code, simulate circuits and manage a full hybrid project — classical, quantum and the glue between them. Everything runs in your browser. Nothing to install.",
+    "newProject": "New hybrid project",
+    "openSample": "Open the sample project",
+    "startLesson": "Start the first lesson",
+    "lanesTitle": "Every project has three lanes",
+    "laneClassical": "Classical",
+    "laneClassicalDesc": "Traditional software: data preparation, optimisers, APIs and UI.",
+    "laneQuantum": "Quantum",
+    "laneQuantumDesc": "Circuits and quantum algorithms, written with Qiskit.",
+    "laneIntegration": "Integration",
+    "laneIntegrationDesc": "How both sides talk: interfaces, orchestration, data flow and integration tests.",
+    "comingSoon": "Available in an upcoming phase"
+  },
+  "panel": {
+    "output": "Output",
+    "terminal": "Terminal",
+    "ready": "QIDEA is ready. Runs and logs will appear here."
+  },
+  "status": {
+    "runtime": "Qiskit runtime",
+    "runtimeNotLoaded": "Qiskit · not loaded",
+    "backend": "Local simulator",
+    "themeToDark": "Switch to dark theme",
+    "themeToLight": "Switch to light theme"
+  }
+}
