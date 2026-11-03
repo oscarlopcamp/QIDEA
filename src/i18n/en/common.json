@@ -7,7 +7,7 @@
     "extensions": "Extensions"
   },
   "sidebar": {
-    "explorerEmpty": "No project open yet. Create one from the welcome page.",
+    "explorerEmpty": "No project is open. Create a hybrid project or import one from a zip file.",
     "managerEmpty": "The project manager shows every stage of your hybrid project across the classical, quantum and integration lanes.",
     "learnEmpty": "Lessons on qubits, entanglement and hybrid algorithms will appear here.",
     "lifecycleEmpty": "Run tests, validate results and package your project for deployment.",
@@ -44,5 +44,59 @@
     "backend": "Local simulator",
     "themeToDark": "Switch to dark theme",
     "themeToLight": "Switch to light theme"
+  },
+  "common": {
+    "cancel": "Cancel"
+  },
+  "lanes": {
+    "classical": "Classical",
+    "quantum": "Quantum",
+    "integration": "Integration"
+  },
+  "templates": {
+    "hybridStarter": "Hybrid starter (VQE)"
+  },
+  "projects": {
+    "newTitle": "New hybrid project",
+    "newBody": "The project starts with a small working example: a variational quantum eigensolver split into classical, quantum and integration folders.",
+    "name": "Project name",
+    "namePlaceholder": "My hybrid project",
+    "create": "Create project",
+    "import": "Import project (.zip)",
+    "importFailed": "Could not import the zip: {{reason}}",
+    "recent": "Your projects",
+    "open": "Open now",
+    "delete": "Delete {{name}}",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteBody": "The project and all its files are removed from this browser. Export it first if you want a copy.",
+    "deleteConfirm": "Delete project"
+  },
+  "explorer": {
+    "newFile": "New file",
+    "newFolder": "New folder",
+    "export": "Export project as zip",
+    "closeProject": "Close project",
+    "rename": "Rename",
+    "delete": "Delete",
+    "fileName": "File name",
+    "folderName": "Folder name",
+    "saving": "Saving…",
+    "saved": "All changes saved in this browser",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteFileBody": "This file is removed from the project.",
+    "deleteFolderBody": "This folder and everything inside it are removed from the project.",
+    "errors": {
+      "empty": "Enter a name.",
+      "invalid": "Names cannot contain / \\ : * ? \" < > |",
+      "exists": "A file or folder with this name already exists here."
+    }
+  },
+  "editor": {
+    "openFiles": "Open files",
+    "closeTab": "Close {{name}}",
+    "run": "Run",
+    "running": "Running…",
+    "runHint": "Run this file (Ctrl/Cmd + Enter)",
+    "loading": "Loading editor…"
   }
 }

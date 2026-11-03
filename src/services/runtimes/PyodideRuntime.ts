@@ -81,8 +81,8 @@ export class PyodideRuntime implements RuntimeProvider {
     return lock
   }
 
-  run(code: string, onEvent: (e: RuntimeEvent) => void): Promise<RunOutcome> {
+  run(files: Record<string, string>, entry: string, onEvent: (e: RuntimeEvent) => void): Promise<RunOutcome> {
     if (!this.worker) return Promise.reject(new Error('Load a Qiskit version first'))
-    return this.request<RunOutcome>({ type: 'run', code }, onEvent)
+    return this.request<RunOutcome>({ type: 'run', files, entry }, onEvent)
   }
 }

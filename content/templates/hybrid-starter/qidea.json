@@ -1,0 +1,17 @@
+{
+  "name": "{{name}}",
+  "schemaVersion": 1,
+  "entry": "integration/main.py",
+  "runtime": {
+    "python": {
+      "packages": {
+        "qiskit": "{{qiskit}}"
+      }
+    }
+  },
+  "lanes": {
+    "classical": "classical/",
+    "quantum": "quantum/",
+    "integration": "integration/"
+  }
+}

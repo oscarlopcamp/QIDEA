@@ -2,6 +2,7 @@
 import type { PyodideAPI } from 'pyodide'
 import type { RuntimeLock } from '@/services/runtimes/types'
 import type { WorkerRequest, WorkerResponse } from './protocol'
+import { PROJECT_DIR, cleanTraceback } from './traceback'
 
 declare const self: DedicatedWorkerGlobalScope
 
@@ -77,20 +78,48 @@ async function load(msg: Extract<WorkerRequest, { type: 'load' }>): Promise<Runt
   return lock
 }
 
-async function run(code: string) {
+
+// Reset the project directory and forget project modules imported by a previous run,
+// so edits to any file are picked up and deleted files really disappear.
+const PREPARE_PY = `
+import os, shutil, sys
+root = ${JSON.stringify(PROJECT_DIR)}
+for name, mod in list(sys.modules.items()):
+    f = getattr(mod, "__file__", None) or ""
+    if f.startswith(root + "/"):
+        del sys.modules[name]
+os.chdir("/")
+shutil.rmtree(root, ignore_errors=True)
+os.makedirs(root, exist_ok=True)
+os.chdir(root)
+if root not in sys.path:
+    sys.path.insert(0, root)
+import importlib
+importlib.invalidate_caches()
+`
+
+async function run(files: Record<string, string>, entry: string) {
   if (!py || !lock) throw new Error('No runtime loaded')
   const id = currentId
   py.setStdout({ batched: (text) => post({ id, type: 'event', event: { type: 'stdout', text } }) })
   py.setStderr({ batched: (text) => post({ id, type: 'event', event: { type: 'stderr', text } }) })
   const started = performance.now()
   try {
-    // Each run gets a fresh namespace so state does not leak between runs.
-    const globals = py.toPy({})
-    await py.runPythonAsync(code, { globals })
+    await py.runPythonAsync(PREPARE_PY)
+    for (const [path, content] of Object.entries(files)) {
+      const full = `${PROJECT_DIR}/${path}`
+      py.FS.mkdirTree(full.slice(0, full.lastIndexOf('/')))
+      py.FS.writeFile(full, content)
+    }
+    // Run like `python <entry>`: fresh __main__ namespace, file name in tracebacks.
+    const globals = py.toPy({ __name__: '__main__', __file__: `${PROJECT_DIR}/${entry}` })
+    await py.runPythonAsync(files[entry] ?? '', { globals, filename: `${PROJECT_DIR}/${entry}` })
     globals.destroy()
     return { ok: true, lock, durationMs: performance.now() - started }
   } catch (err) {
-    return { ok: false, error: String(err), lock, durationMs: performance.now() - started }
+    // Show the traceback relative to the project, the way users see their files.
+    const msg = cleanTraceback(String(err instanceof Error ? err.message : err))
+    return { ok: false, error: msg, lock, durationMs: performance.now() - started }
   }
 }
 
@@ -99,7 +128,7 @@ self.onmessage = async (ev: MessageEvent<WorkerRequest>) => {
   currentId = msg.id
   try {
     if (msg.type === 'load') post({ id: msg.id, type: 'loaded', lock: await load(msg) })
-    else post({ id: msg.id, type: 'ran', outcome: await run(msg.code) })
+    else post({ id: msg.id, type: 'ran', outcome: await run(msg.files, msg.entry) })
   } catch (err) {
     post({ id: msg.id, type: 'failed', error: err instanceof Error ? err.message : String(err) })
   }

@@ -1,10 +1,12 @@
+import { useEffect } from 'react'
 import { Group, Panel, Separator } from 'react-resizable-panels'
+import { useWorkspace } from '@/stores/workspace'
+import { EditorArea } from '@/ui/editor/EditorArea'
 import { useUi } from '@/stores/ui'
 import { ActivityBar } from './ActivityBar'
 import { BottomPanel } from './BottomPanel'
 import { Sidebar } from './Sidebar'
 import { StatusBar } from './StatusBar'
-import { WelcomeView } from './WelcomeView'
 import { useIsNarrow } from './useIsNarrow'
 
 const sep = 'bg-line transition-colors hover:bg-accent data-[separator=active]:bg-accent'
@@ -12,12 +14,17 @@ const sep = 'bg-line transition-colors hover:bg-accent data-[separator=active]:b
 export function Workbench() {
   const sidebarOpen = useUi((s) => s.sidebarOpen)
   const narrow = useIsNarrow()
+  const init = useWorkspace((s) => s.init)
+
+  useEffect(() => {
+    void init()
+  }, [init])
 
   const main = (
     <Group orientation="vertical">
       <Panel minSize={160} className="min-w-0">
         <main className="h-full w-full overflow-hidden bg-bg">
-          <WelcomeView />
+          <EditorArea />
         </main>
       </Panel>
       <Separator className={`h-px ${sep}`} />

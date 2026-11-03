@@ -25,6 +25,8 @@ interface RuntimeState {
   select: (version: string) => void
   ensureLoaded: () => Promise<boolean>
   runCheck: () => Promise<void>
+  /** Run `entry` with the given project files. Loads the selected Qiskit version first if needed. */
+  runFiles: (files: Record<string, string>, entry: string) => Promise<void>
   clearOutput: () => void
 }
 
@@ -78,18 +80,23 @@ export const useRuntime = create<RuntimeState>((set, get) => {
       }
     },
 
-    runCheck: async () => {
+    runCheck: () => get().runFiles({ 'bell_check.py': BELL_CHECK }, 'bell_check.py'),
+
+    runFiles: async (files, entry) => {
+      if (get().phase === 'running') return
       if (!(await get().ensureLoaded())) return
       set({ phase: 'running' })
-      print('info', '$ python bell_check.py')
+      print('info', `$ python ${entry}`)
       try {
-        const outcome = await runtime.run(BELL_CHECK, onEvent)
+        const outcome = await runtime.run(files, entry, onEvent)
         if (outcome.ok) {
           const pkgs = Object.entries(outcome.lock.packages)
             .map(([k, v]) => `${k} ${v}`)
             .join(', ')
           print('success', `Finished in ${Math.round(outcome.durationMs)} ms. Runtime: ${pkgs}`)
         } else print('error', outcome.error ?? 'Run failed')
+      } catch (err) {
+        print('error', (err as Error).message)
       } finally {
         set({ phase: 'ready' })
       }

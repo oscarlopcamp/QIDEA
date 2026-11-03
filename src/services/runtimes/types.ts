@@ -49,5 +49,6 @@ export interface RuntimeProvider {
   listVersions(): Promise<{ versions: string[]; default: string }>
   /** Load (or switch to) a Qiskit version. Resolves with the exact environment. */
   load(qiskitVersion: string, onEvent: (e: RuntimeEvent) => void): Promise<RuntimeLock>
-  run(code: string, onEvent: (e: RuntimeEvent) => void): Promise<RunOutcome>
+  /** Run `entry` (a project-relative path) with every project file importable. */
+  run(files: Record<string, string>, entry: string, onEvent: (e: RuntimeEvent) => void): Promise<RunOutcome>
 }

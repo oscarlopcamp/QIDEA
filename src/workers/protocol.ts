@@ -10,7 +10,8 @@ export type WorkerRequest =
       qiskitVersion: string
       entry: QiskitRuntimeEntry
     }
-  | { id: number; type: 'run'; code: string }
+  /** Run `entry` with the whole project available on the Python path. */
+  | { id: number; type: 'run'; files: Record<string, string>; entry: string }
 
 /** Messages Python worker -> main thread. */
 export type WorkerResponse =
