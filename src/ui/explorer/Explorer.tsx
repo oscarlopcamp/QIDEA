@@ -1,4 +1,4 @@
-import { useMemo, useState, type KeyboardEvent } from 'react'
+import { useEffect, useMemo, useState, type KeyboardEvent } from 'react'
 import {
   ChevronRight,
   Download,
@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { buildTree, dirname, type TreeNode } from '@/core/fs/paths'
 import { MANIFEST_PATH, parseManifest, type LaneId } from '@/core/model/project'
+import { useUi } from '@/stores/ui'
 import { useWorkspace, type FsError } from '@/stores/workspace'
 import { Dialog, btnDanger, btnSecondary } from '@/ui/common/Dialog'
 import { FileIcon } from './FileIcon'
@@ -37,6 +38,8 @@ export function Explorer() {
   const [selected, setSelected] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
 
+  const request = useUi((s) => s.explorerRequest)
+
   const tree = useMemo(() => buildTree(Object.values(ws.entries)), [ws.entries])
   const laneOf = useMemo(() => {
     const lanes = parseManifest(ws.entries[MANIFEST_PATH]?.content)?.lanes ?? {}
@@ -45,14 +48,20 @@ export function Explorer() {
     return map
   }, [ws.entries])
 
+  // "New file" / "New folder" commands from the palette.
+  useEffect(() => {
+    if (request) startNew(request.kind)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [request])
+
   if (!ws.project) return <NoProject />
 
-  const targetDir = () => {
+  function targetDir() {
     if (!selected) return ''
     return ws.entries[selected]?.kind === 'folder' ? selected : dirname(selected)
   }
 
-  const startNew = (kind: 'file' | 'folder') => {
+  function startNew(kind: 'file' | 'folder') {
     const dir = targetDir()
     if (dir) ws.toggleFolder(dir, true)
     setError(null)

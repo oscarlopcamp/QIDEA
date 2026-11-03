@@ -14,14 +14,16 @@ page.on('console', (m) => {
 page.on('pageerror', (e) => console.log('[pageerror]', e.message))
 await page.goto(url)
 
-const select = page.locator('footer select')
-await select.waitFor()
-const versions = await select.locator('option').evaluateAll((os) => os.map((o) => o.value))
-console.log('published versions:', versions.join(', '))
+const versionButton = page.getByRole('button', { name: /^Qiskit version/ })
+await versionButton.waitFor()
+const versions = (await (await page.request.get(new URL('runtimes/index.json', url).href)).json()).qiskit
+console.log('published versions:', Object.keys(versions).join(', '))
 
 let failed = false
-for (const v of versions) {
-  await select.selectOption(v)
+for (const v of Object.keys(versions)) {
+  // Pick the version through the command palette, as a user would.
+  await versionButton.click()
+  await page.getByRole('option', { name: new RegExp(`^Qiskit ${v.replaceAll('.', '\\.')}`) }).click()
   await page.getByRole('button', { name: 'Clear output' }).click()
   const t0 = Date.now()
   await page.getByRole('button', { name: 'Run Qiskit check' }).click()

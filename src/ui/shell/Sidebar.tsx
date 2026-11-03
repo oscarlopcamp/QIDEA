@@ -1,20 +1,17 @@
 import { useTranslation } from 'react-i18next'
+import { useContributions } from '@/extensions'
 import { useUi } from '@/stores/ui'
-import { Explorer } from '@/ui/explorer/Explorer'
 
+/** Renders whichever sidebar view an extension registered under the active id. */
 export function Sidebar() {
   const { t } = useTranslation()
-  const view = useUi((s) => s.activeView)
+  const activeView = useUi((s) => s.activeView)
+  const view = useContributions('views').find((v) => v.id === activeView)
+  if (!view) return <aside className="h-full bg-surface" />
+  const View = view.component
   return (
-    <aside className="flex h-full flex-col bg-surface" aria-label={t(`views.${view}`)}>
-      {view === 'explorer' ? (
-        <Explorer />
-      ) : (
-        <>
-          <h2 className="px-4 pb-2 pt-3 text-[13px] font-semibold text-text">{t(`views.${view}`)}</h2>
-          <p className="px-4 text-[13px] leading-relaxed text-muted">{t(`sidebar.${view}Empty`)}</p>
-        </>
-      )}
+    <aside className="flex h-full flex-col bg-surface" aria-label={t(view.title, { defaultValue: view.title })}>
+      <View />
     </aside>
   )
 }

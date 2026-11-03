@@ -46,7 +46,8 @@
     "themeToLight": "Switch to light theme"
   },
   "common": {
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "dismiss": "Dismiss"
   },
   "lanes": {
     "classical": "Classical",
@@ -54,7 +55,8 @@
     "integration": "Integration"
   },
   "templates": {
-    "hybridStarter": "Hybrid starter (VQE)"
+    "hybridStarter": "Hybrid starter (VQE)",
+    "hybridStarterDesc": "A variational quantum eigensolver split into classical, quantum and integration folders. Runs as it is."
   },
   "projects": {
     "newTitle": "New hybrid project",
@@ -69,7 +71,8 @@
     "delete": "Delete {{name}}",
     "deleteTitle": "Delete “{{name}}”?",
     "deleteBody": "The project and all its files are removed from this browser. Export it first if you want a copy.",
-    "deleteConfirm": "Delete project"
+    "deleteConfirm": "Delete project",
+    "template": "Template"
   },
   "explorer": {
     "newFile": "New file",
@@ -98,5 +101,99 @@
     "running": "Running…",
     "runHint": "Run this file (Ctrl/Cmd + Enter)",
     "loading": "Loading editor…"
+  },
+  "palette": {
+    "commandsPlaceholder": "Type a command",
+    "filesPlaceholder": "Search files by name (type > for commands)",
+    "pickPlaceholder": "Select an option",
+    "noResults": "No matching results",
+    "noProject": "Open a project to search its files"
+  },
+  "commands": {
+    "categoryView": "View",
+    "categoryProject": "Project",
+    "categoryFile": "File",
+    "categoryRun": "Run",
+    "showCommands": "Show all commands",
+    "goToFile": "Go to file",
+    "toggleSidebar": "Toggle sidebar",
+    "togglePanel": "Toggle output panel",
+    "toggleTheme": "Toggle light/dark theme",
+    "showExplorer": "Show explorer",
+    "showExtensions": "Show extensions",
+    "newProject": "New hybrid project",
+    "openProject": "Open project",
+    "importProject": "Import project from zip",
+    "exportProject": "Export project as zip",
+    "closeProject": "Close project",
+    "newFile": "New file",
+    "newFolder": "New folder",
+    "runFile": "Run active Python file",
+    "closeTab": "Close editor tab",
+    "selectQiskitVersion": "Select Qiskit version",
+    "runQiskitCheck": "Run Qiskit check",
+    "clearOutput": "Clear output"
+  },
+  "extensions": {
+    "lead_one": "{{count}} extension installed. Every QIDEA feature is built as an extension.",
+    "lead_other": "{{count}} extensions installed. Every QIDEA feature is built as an extension.",
+    "active": "Active",
+    "failed": "Failed to activate",
+    "kinds": {
+      "commands_one": "{{count}} command",
+      "commands_other": "{{count}} commands",
+      "views_one": "{{count}} view",
+      "views_other": "{{count}} views",
+      "languages_one": "{{count}} language",
+      "languages_other": "{{count}} languages",
+      "runtimes_one": "{{count}} runtime",
+      "runtimes_other": "{{count}} runtimes",
+      "backends_one": "{{count}} backend",
+      "backends_other": "{{count}} backends",
+      "projectTemplates_one": "{{count}} project template",
+      "projectTemplates_other": "{{count}} project templates",
+      "methodologies_one": "{{count}} methodology",
+      "methodologies_other": "{{count}} methodologies"
+    }
+  },
+  "methodologies": {
+    "generic": {
+      "title": "Generic lifecycle",
+      "description": "Eight stages that fit any methodology."
+    }
+  },
+  "stages": {
+    "requirements": {
+      "title": "Requirements",
+      "description": "What the system must do, and for whom."
+    },
+    "analysis": {
+      "title": "Analysis",
+      "description": "Which parts benefit from quantum computing, and which stay classical."
+    },
+    "design": {
+      "title": "Design",
+      "description": "Components, circuits and the interfaces between them."
+    },
+    "implementation": {
+      "title": "Implementation",
+      "description": "Write the classical code, the circuits and the glue."
+    },
+    "testing": {
+      "title": "Testing",
+      "description": "Unit and integration tests for each lane."
+    },
+    "validation": {
+      "title": "Validation",
+      "description": "Check results against expected distributions and requirements."
+    },
+    "deployment": {
+      "title": "Deployment",
+      "description": "Package the system and choose where it runs."
+    },
+    "maintenance": {
+      "title": "Maintenance",
+      "description": "Keep runtimes, backends and code up to date."
+    }
   }
 }

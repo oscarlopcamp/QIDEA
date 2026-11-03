@@ -4,18 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { useWorkspace } from '@/stores/workspace'
 import { QideaMark } from '@/ui/brand/Logo'
 import { Dialog, btnDanger, btnSecondary } from '@/ui/common/Dialog'
-import { useProjectActions } from '@/ui/projects/projectActions'
+import { host, useContributions } from '@/extensions'
 
-const STAGES = [
-  'Requirements',
-  'Analysis',
-  'Design',
-  'Implementation',
-  'Testing',
-  'Validation',
-  'Deployment',
-  'Maintenance',
-]
 
 const LANES = [
   { key: 'Classical', color: 'var(--lane-classical)' },
@@ -26,7 +16,9 @@ const LANES = [
 export function WelcomeView() {
   const { t } = useTranslation()
   const soon = t('welcome.comingSoon')
-  const actions = useProjectActions()
+  const methodology = useContributions('methodologies')[0]
+  const stages = methodology?.stages.map((st) => t(st.title, { defaultValue: st.title })) ?? []
+  const cols = `140px repeat(${Math.max(stages.length, 1)}, 1fr)`
   const { projects, project, openProject, deleteProject } = useWorkspace()
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null)
 
@@ -42,14 +34,14 @@ export function WelcomeView() {
         <div className="mt-8 flex flex-wrap gap-3">
           <button
             type="button"
-            onClick={actions.openNew}
+            onClick={() => void host.executeCommand('qidea.project.new')}
             className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 font-medium text-accent-ink"
           >
             <FolderPlus size={16} /> {t('welcome.newProject')}
           </button>
           <button
             type="button"
-            onClick={actions.openImport}
+            onClick={() => void host.executeCommand('qidea.project.import')}
             className="inline-flex items-center gap-2 rounded-md border border-line px-4 py-2 text-text hover:bg-surface"
           >
             <Upload size={16} /> {t('projects.import')}
@@ -71,7 +63,6 @@ export function WelcomeView() {
             <BookOpen size={16} /> {t('welcome.startLesson')}
           </button>
         </div>
-        {actions.elements}
 
         {projects.length > 0 && (
           <section className="mt-12" aria-labelledby="recent-projects">
@@ -130,9 +121,9 @@ export function WelcomeView() {
         {/* A miniature of the project manager: lanes run across the lifecycle stages. */}
         <div className="mt-4 overflow-x-auto rounded-lg border border-line bg-surface">
           <div className="min-w-[860px]">
-            <div className="grid grid-cols-[140px_repeat(8,1fr)] border-b border-line text-[11.5px] text-muted">
+            <div className="grid border-b border-line text-[11.5px] text-muted" style={{ gridTemplateColumns: cols }}>
               <span />
-              {STAGES.map((s) => (
+              {stages.map((s) => (
                 <span key={s} className="px-2 py-2">
                   {s}
                 </span>
@@ -141,18 +132,19 @@ export function WelcomeView() {
             {LANES.map(({ key, color }, laneIdx) => (
               <div
                 key={key}
-                className="grid grid-cols-[140px_repeat(8,1fr)] items-center border-b border-line last:border-b-0"
+                className="grid items-center border-b border-line last:border-b-0"
+                style={{ gridTemplateColumns: cols }}
               >
                 <div className="flex items-center gap-2 px-3 py-3">
                   <span className="h-3 w-3 rounded-full" style={{ background: color }} />
                   <span className="text-[13px] font-medium text-text">{t(`welcome.lane${key}`)}</span>
                 </div>
-                {STAGES.map((s, i) => (
+                {stages.map((s, i) => (
                   <div key={s} className="px-2 py-3">
                     {(i + laneIdx) % 3 !== 2 && (
                       <span
                         className="block h-1.5 rounded-full"
-                        style={{ background: color, opacity: i < 4 ? 0.9 : 0.35 }}
+                        style={{ background: color, opacity: i < stages.length / 2 ? 0.9 : 0.35 }}
                       />
                     )}
                   </div>

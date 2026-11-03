@@ -7,7 +7,7 @@ import {
   type FileEntry,
   type ProjectMeta,
 } from '@/core/model/project'
-import { instantiateTemplate } from '@/services/projects/templates'
+import { host } from '@/extensions'
 import { exportZip, importZip } from '@/services/projects/zip'
 import { storage } from '@/services/storage'
 import { useRuntime } from './runtime'
@@ -154,7 +154,9 @@ export const useWorkspace = create<WorkspaceState>((set, get) => {
       const qiskit = useRuntime.getState().selected ?? ''
       const now = Date.now()
       const meta: ProjectMeta = { id: crypto.randomUUID(), name, createdAt: now, updatedAt: now, template }
-      await storage.putProject(meta, instantiateTemplate(template, { name, qiskit }))
+      const tpl = host.find('projectTemplates', template)
+      if (!tpl) throw new Error(`Unknown project template: ${template}`)
+      await storage.putProject(meta, tpl.instantiate({ name, qiskit }))
       await get().refreshProjects()
       await load(meta)
     },

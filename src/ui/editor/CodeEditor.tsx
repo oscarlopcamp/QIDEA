@@ -1,6 +1,7 @@
 import Editor, { type OnMount } from '@monaco-editor/react'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { languageFor } from '@/core/fs/paths'
+import { useContributions } from '@/extensions'
 import { useUi } from '@/stores/ui'
 import { useWorkspace } from '@/stores/workspace'
 import { monaco } from './monacoSetup'
@@ -11,7 +12,9 @@ export default function CodeEditor({ path }: { path: string }) {
   const updateContent = useWorkspace((s) => s.updateContent)
   const entries = useWorkspace((s) => s.entries)
   const theme = useUi((s) => s.theme)
-  const runRef = useRef(useWorkspace.getState().runFile)
+  const languages = useContributions('languages')
+  const ext = path.slice(path.lastIndexOf('.') + 1).toLowerCase()
+  const language = languages.find((l) => l.extensions.includes(ext))?.id ?? languageFor(path)
 
   // Drop models of files that were deleted or renamed away.
   useEffect(() => {
@@ -21,16 +24,14 @@ export default function CodeEditor({ path }: { path: string }) {
     }
   }, [entries])
 
-  const onMount: OnMount = (editor) => {
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => void runRef.current())
-    editor.focus()
-  }
+  // Shortcuts (run, palette, ...) are global extension keybindings, handled by the workbench.
+  const onMount: OnMount = (editor) => editor.focus()
 
   return (
     <Editor
       path={path}
-      defaultLanguage={languageFor(path)}
-      language={languageFor(path)}
+      defaultLanguage={language}
+      language={language}
       value={content}
       theme={theme === 'dark' ? 'qidea-dark' : 'qidea-light'}
       onChange={(v) => updateContent(path, v ?? '')}

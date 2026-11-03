@@ -78,7 +78,7 @@ check('file renamed (tab follows)', await page.getByRole('tab', { name: 'ideas.m
 const ideas = explorer.getByRole('button', { name: 'ideas.md' })
 await ideas.click()
 await ideas.press('Delete')
-await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click()
+await page.getByRole('dialog').getByRole('button', { name: 'Delete', exact: true }).click()
 await page.waitForTimeout(300)
 check('file deleted', !(await ideas.isVisible()) && !(await page.getByRole('tab', { name: 'ideas.md' }).isVisible()))
 
@@ -100,11 +100,11 @@ const [download] = await Promise.all([
 const zipPath = await download.path()
 check('export downloads a zip', download.suggestedFilename() === 'bell-to-vqe.zip', download.suggestedFilename())
 await page.getByRole('button', { name: 'Close project' }).click()
-await page.locator('input[type=file]').first().setInputFiles({
-  name: 'bell-to-vqe.zip',
-  mimeType: 'application/zip',
-  buffer: await (await import('node:fs/promises')).readFile(zipPath),
-})
+const [chooser] = await Promise.all([
+  page.waitForEvent('filechooser'),
+  page.getByRole('button', { name: 'Import project (.zip)' }).first().click(),
+])
+await chooser.setFiles(zipPath)
 await page.getByRole('tab', { name: 'main.py' }).waitFor({ timeout: 15000 })
 const imported = await page.evaluate(async () => {
   const { useWorkspace } = await import('/src/stores/workspace.ts')

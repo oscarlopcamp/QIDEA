@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Eraser, Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useRuntime, type OutputKind } from '@/stores/runtime'
+import { useUi } from '@/stores/ui'
 
 const KIND_CLASS: Record<OutputKind, string> = {
   info: 'text-muted',
@@ -14,6 +15,7 @@ const KIND_CLASS: Record<OutputKind, string> = {
 export function BottomPanel() {
   const { t } = useTranslation()
   const { output, phase, runCheck, clearOutput } = useRuntime()
+  const open = useUi((s) => s.panelOpen)
   const end = useRef<HTMLDivElement>(null)
   const busy = phase === 'loading' || phase === 'running'
 
@@ -22,7 +24,11 @@ export function BottomPanel() {
   }, [output.length])
 
   return (
-    <section className="flex h-full flex-col border-t border-line bg-surface" aria-label={t('panel.output')}>
+    <section
+      className="flex h-full flex-col border-t border-line bg-surface"
+      aria-label={t('panel.output')}
+      hidden={!open}
+    >
       <div className="flex items-center gap-4 px-4 pt-2 text-[12px]">
         <span className="border-b-2 border-accent pb-1 font-medium text-text">{t('panel.output')}</span>
         <span className="pb-1 text-muted">{t('panel.terminal')}</span>

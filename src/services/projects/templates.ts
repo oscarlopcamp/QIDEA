@@ -1,13 +1,5 @@
 import type { FileEntry } from '@/core/model/project'
 
-export interface TemplateInfo {
-  id: string
-  /** i18n key for the template name. */
-  titleKey: string
-}
-
-export const TEMPLATES: TemplateInfo[] = [{ id: 'hybrid-starter', titleKey: 'templates.hybridStarter' }]
-
 // Templates live in /content/templates/<id>/ as plain files, bundled as text.
 const raw = import.meta.glob('/content/templates/**/*', { query: '?raw', import: 'default', eager: true }) as Record<
   string,

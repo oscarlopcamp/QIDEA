@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { PyodideRuntime } from '@/services/runtimes/PyodideRuntime'
+import { host } from '@/extensions'
 import { BELL_CHECK } from '@/services/runtimes/samples'
-import type { RuntimeEvent, RuntimeLock, RuntimePhase } from '@/services/runtimes/types'
+import type { RuntimeEvent, RuntimeLock, RuntimePhase, RuntimeProvider } from '@/services/runtimes/types'
 
 export type OutputKind = 'info' | 'stdout' | 'stderr' | 'error' | 'success'
 export interface OutputLine {
@@ -10,7 +10,13 @@ export interface OutputLine {
   text: string
 }
 
-const runtime = new PyodideRuntime()
+/** The Python runtime, contributed by the `qidea.python-runtime` extension. */
+const RUNTIME_ID = 'pyodide'
+function runtime(): RuntimeProvider {
+  const r = host.find('runtimes', RUNTIME_ID)
+  if (!r) throw new Error('No Python runtime is installed (extension qidea.python-runtime)')
+  return r
+}
 let lineId = 0
 
 interface RuntimeState {
@@ -52,7 +58,7 @@ export const useRuntime = create<RuntimeState>((set, get) => {
 
     init: async () => {
       try {
-        const { versions, default: def } = await runtime.listVersions()
+        const { versions, default: def } = await runtime().listVersions()
         set({ versions, selected: get().selected ?? def })
       } catch (err) {
         print('error', (err as Error).message)
@@ -68,7 +74,7 @@ export const useRuntime = create<RuntimeState>((set, get) => {
       set({ phase: 'loading', progress: null })
       const started = performance.now()
       try {
-        const lock = await runtime.load(selected, onEvent)
+        const lock = await runtime().load(selected, onEvent)
         const secs = ((performance.now() - started) / 1000).toFixed(1)
         set({ phase: 'ready', loadedVersion: selected, lock, progress: null })
         print('success', `Qiskit ${lock.packages.qiskit} ready in ${secs}s (Python ${lock.python}, Pyodide ${lock.pyodide})`)
@@ -88,7 +94,7 @@ export const useRuntime = create<RuntimeState>((set, get) => {
       set({ phase: 'running' })
       print('info', `$ python ${entry}`)
       try {
-        const outcome = await runtime.run(files, entry, onEvent)
+        const outcome = await runtime().run(files, entry, onEvent)
         if (outcome.ok) {
           const pkgs = Object.entries(outcome.lock.packages)
             .map(([k, v]) => `${k} ${v}`)
