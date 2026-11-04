@@ -8,7 +8,12 @@ export interface ExplorerRequest {
   nonce: number
 }
 
+/** The two modes of a project: writing code, or managing it on the lifecycle board. */
+export type WorkbenchMode = 'code' | 'manager'
+
 interface UiState {
+  mode: WorkbenchMode
+  setMode: (mode: WorkbenchMode) => void
   /** Id of the active sidebar view, as registered by an extension. */
   activeView: string
   sidebarOpen: boolean
@@ -31,6 +36,8 @@ function readTheme(): Theme {
 }
 
 export const useUi = create<UiState>((set, get) => ({
+  mode: 'code',
+  setMode: (mode) => set({ mode }),
   activeView: 'explorer',
   // On phones the sidebar is an overlay, so start with it closed.
   sidebarOpen: !matchMedia('(max-width: 767px)').matches,

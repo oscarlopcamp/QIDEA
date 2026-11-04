@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { basename, dirname, isInside, joinPath, normalizePath, validateName } from '@/core/fs/paths'
+import { basename, dirname, isInside, joinPath, validateName } from '@/core/fs/paths'
 import {
   MANIFEST_PATH,
   parseManifest,
@@ -10,7 +10,9 @@ import {
 import { host } from '@/extensions'
 import { exportZip, importZip } from '@/services/projects/zip'
 import { storage } from '@/services/storage'
+import { parseLock, LOCK_PATH } from '@/core/model/runs'
 import { useRuntime } from './runtime'
+import { useUi } from './ui'
 
 const LAST_PROJECT_KEY = 'qidea.lastProject'
 const sessionKey = (id: string) => `qidea.session.${id}`
@@ -67,10 +69,15 @@ interface WorkspaceState {
   updateContent: (path: string, content: string) => void
   flush: () => Promise<void>
 
-  openFile: (path: string) => void
+  openFile: (path: string, line?: number) => void
+  /** Line to reveal in the editor after openFile(path, line). */
+  reveal: { path: string; line: number; nonce: number } | null
+  /** Create or overwrite a file (creating missing folders). Used for QIDEA-managed files. */
+  writeFile: (path: string, content: string) => Promise<void>
+  /** Delete files without touching tabs bookkeeping beyond what deleteEntry does. */
+  deleteFiles: (paths: string[]) => Promise<void>
   closeTab: (path: string) => void
   toggleFolder: (path: string, open?: boolean) => void
-  runFile: (path?: string) => Promise<void>
 }
 
 const pendingSaves = new Map<string, ReturnType<typeof setTimeout>>()
@@ -92,7 +99,10 @@ export const useWorkspace = create<WorkspaceState>((set, get) => {
 
   /** Pick the Qiskit version the project declares, when that version is published. */
   const syncRuntimeVersion = async (entries: Record<string, FileEntry>) => {
-    const wanted = parseManifest(entries[MANIFEST_PATH]?.content)?.runtime?.python?.packages?.qiskit
+    // The exact locked version wins over the version the manifest asks for.
+    const wanted =
+      parseLock(entries[LOCK_PATH]?.content)?.packages.qiskit ??
+      parseManifest(entries[MANIFEST_PATH]?.content)?.runtime?.python?.packages?.qiskit
     if (!wanted) return
     const rt = useRuntime.getState()
     if (!rt.versions.length) await rt.init()
@@ -136,6 +146,7 @@ export const useWorkspace = create<WorkspaceState>((set, get) => {
     active: null,
     expanded: [],
     saving: false,
+    reveal: null,
 
     init: async () => {
       await get().refreshProjects()
@@ -300,9 +311,12 @@ export const useWorkspace = create<WorkspaceState>((set, get) => {
       }
     },
 
-    openFile: (path) => {
+    openFile: (path, line) => {
       if (get().entries[path]?.kind !== 'file') return
+      // Opening a file always shows code, even from Manager mode.
+      useUi.getState().setMode('code')
       set((s) => ({
+        reveal: line ? { path, line, nonce: Date.now() } : s.reveal,
         tabs: s.tabs.includes(path) ? s.tabs : [...s.tabs, path],
         active: path,
         // Reveal the file in the explorer.
@@ -330,13 +344,29 @@ export const useWorkspace = create<WorkspaceState>((set, get) => {
       persistSession()
     },
 
-    runFile: async (path) => {
-      const target = path ?? get().active
-      if (!target || !target.endsWith('.py')) return
-      await get().flush()
-      const files: Record<string, string> = {}
-      for (const e of Object.values(get().entries)) if (e.kind === 'file') files[e.path] = e.content
-      await useRuntime.getState().runFiles(files, normalizePath(target))
+    writeFile: async (path, content) => {
+      const p = get().project
+      if (!p) return
+      const created: FileEntry[] = []
+      const parts = path.split('/')
+      for (let i = 1; i < parts.length; i++) {
+        const d = parts.slice(0, i).join('/')
+        if (!get().entries[d]) created.push({ path: d, kind: 'folder', content: '' })
+      }
+      created.push({ path, kind: 'file', content })
+      for (const e of created) await storage.writeFile(p.id, e)
+      set((s) => ({ entries: { ...s.entries, ...Object.fromEntries(created.map((e) => [e.path, e])) } }))
+    },
+
+    deleteFiles: async (paths) => {
+      const p = get().project
+      if (!p || !paths.length) return
+      await storage.deleteFiles(p.id, paths)
+      set((s) => {
+        const entries = { ...s.entries }
+        for (const d of paths) delete entries[d]
+        return { entries }
+      })
     },
   }
 })

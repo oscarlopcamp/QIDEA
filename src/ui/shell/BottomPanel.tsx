@@ -3,6 +3,7 @@ import { Eraser, Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useRuntime, type OutputKind } from '@/stores/runtime'
 import { useUi } from '@/stores/ui'
+import { HistoryView } from '@/ui/runs/HistoryView'
 import { ResultsView } from '@/ui/viz/ResultsView'
 
 const KIND_CLASS: Record<OutputKind, string> = {
@@ -32,7 +33,7 @@ export function BottomPanel() {
     >
       <div className="flex items-center gap-4 px-4 pt-2 text-[12px]">
         <div role="tablist" aria-label={t('panel.tabs')} className="flex gap-4">
-          {(['output', 'results'] as const).map((tab) => (
+          {(['output', 'results', 'history'] as const).map((tab) => (
             <button
               key={tab}
               type="button"
@@ -71,6 +72,11 @@ export function BottomPanel() {
           </button>
         </div>
       </div>
+      {panelTab === 'history' && (
+        <div className="min-h-0 flex-1" role="tabpanel" aria-label={t('panel.history')}>
+          <HistoryView />
+        </div>
+      )}
       {panelTab === 'results' && (
         <div className="min-h-0 flex-1 overflow-auto" role="tabpanel" aria-label={t('panel.results')}>
           <ResultsView />

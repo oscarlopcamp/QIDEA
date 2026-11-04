@@ -1,6 +1,8 @@
 import type { QideaExtension } from '@/extensions/api'
 import { PyodideRuntime } from '@/services/runtimes/PyodideRuntime'
 import { useRuntime } from '@/stores/runtime'
+import { listRuns, useRuns } from '@/stores/runs'
+import { useUi } from '@/stores/ui'
 
 export const pythonRuntimeExtension: QideaExtension = {
   id: 'qidea.python-runtime',
@@ -37,6 +39,24 @@ export const pythonRuntimeExtension: QideaExtension = {
       title: 'commands.runQiskitCheck',
       category: 'Qiskit',
       run: () => useRuntime.getState().runCheck(),
+    })
+
+    ctx.commands.register({
+      id: 'qidea.runs.showHistory',
+      title: 'commands.showRunHistory',
+      category: 'commands.categoryRun',
+      run: () => {
+        useUi.getState().setPanelOpen(true)
+        useRuntime.getState().setPanelTab('history')
+      },
+    })
+
+    ctx.commands.register({
+      id: 'qidea.runs.reproduceLast',
+      title: 'commands.reproduceLastRun',
+      category: 'commands.categoryRun',
+      when: () => listRuns().length > 0,
+      run: () => useRuns.getState().reproduce(listRuns()[0].id),
     })
 
     ctx.commands.register({

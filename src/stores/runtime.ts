@@ -26,7 +26,18 @@ export interface ResultItem {
   visual: Visual
 }
 
-export type PanelTab = 'output' | 'results'
+export type PanelTab = 'output' | 'results' | 'history'
+
+/** What a run produced, handed to whoever records it. */
+export interface RunReport {
+  entry: string
+  ok: boolean
+  error?: string
+  durationMs: number
+  lock: RuntimeLock
+  output: string
+  visuals: Visual[]
+}
 
 interface RuntimeState {
   /** Visual results of the latest run. */
@@ -45,7 +56,9 @@ interface RuntimeState {
   ensureLoaded: () => Promise<boolean>
   runCheck: () => Promise<void>
   /** Run `entry` with the given project files. Loads the selected Qiskit version first if needed. */
-  runFiles: (files: Record<string, string>, entry: string) => Promise<void>
+  runFiles: (files: Record<string, string>, entry: string) => Promise<RunReport | null>
+  /** Print a line in the output panel (used by other stores for notices). */
+  print: (kind: OutputKind, text: string) => void
   clearOutput: () => void
 }
 
@@ -109,14 +122,19 @@ export const useRuntime = create<RuntimeState>((set, get) => {
       }
     },
 
-    runCheck: () => get().runFiles({ 'bell_check.py': BELL_CHECK }, 'bell_check.py'),
+    runCheck: async () => {
+      await get().runFiles({ 'bell_check.py': BELL_CHECK }, 'bell_check.py')
+    },
+
+    print,
 
     runFiles: async (files, entry) => {
-      if (get().phase === 'running') return
-      if (!(await get().ensureLoaded())) return
+      if (get().phase === 'running' || get().phase === 'loading') return null
+      if (!(await get().ensureLoaded())) return null
       currentEntry = entry
       set({ phase: 'running', results: [], panelTab: 'output' })
       print('info', `$ python ${entry}`)
+      const firstLine = lineId
       try {
         const outcome = await runtime().run(files, entry, onEvent)
         if (outcome.ok) {
@@ -125,8 +143,23 @@ export const useRuntime = create<RuntimeState>((set, get) => {
             .join(', ')
           print('success', `Finished in ${Math.round(outcome.durationMs)} ms. Runtime: ${pkgs}`)
         } else print('error', outcome.error ?? 'Run failed')
+        const output = get()
+          .output.filter((l) => l.id >= firstLine && (l.kind === 'stdout' || l.kind === 'stderr' || l.kind === 'error'))
+          .map((l) => l.text)
+          .join('\n')
+          .slice(0, 20000)
+        return {
+          entry,
+          ok: outcome.ok,
+          error: outcome.error,
+          durationMs: outcome.durationMs,
+          lock: outcome.lock,
+          output,
+          visuals: get().results.map((r) => r.visual),
+        }
       } catch (err) {
         print('error', (err as Error).message)
+        return null
       } finally {
         set({ phase: 'ready' })
       }

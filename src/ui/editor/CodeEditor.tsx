@@ -1,5 +1,6 @@
 import Editor, { type OnMount } from '@monaco-editor/react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import type { editor as MonacoEditor } from 'monaco-editor'
 import { languageFor } from '@/core/fs/paths'
 import { useContributions } from '@/extensions'
 import { useUi } from '@/stores/ui'
@@ -24,8 +25,29 @@ export default function CodeEditor({ path }: { path: string }) {
     }
   }, [entries])
 
+  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null)
+  const reveal = useWorkspace((s) => s.reveal)
+
+  // Jump to a line requested by openFile(path, line), e.g. from a project-manager link.
+  useEffect(() => {
+    const ed = editorRef.current
+    if (!ed || !reveal || reveal.path !== path) return
+    const line = Math.min(reveal.line, ed.getModel()?.getLineCount() ?? reveal.line)
+    ed.revealLineInCenter(line)
+    ed.setSelection({ startLineNumber: line, startColumn: 1, endLineNumber: line, endColumn: Number.MAX_SAFE_INTEGER })
+    ed.focus()
+  }, [reveal, path])
+
   // Shortcuts (run, palette, ...) are global extension keybindings, handled by the workbench.
-  const onMount: OnMount = (editor) => editor.focus()
+  const onMount: OnMount = (editor) => {
+    editorRef.current = editor
+    const r = useWorkspace.getState().reveal
+    if (r && r.path === path) {
+      editor.revealLineInCenter(r.line)
+      editor.setSelection({ startLineNumber: r.line, startColumn: 1, endLineNumber: r.line, endColumn: Number.MAX_SAFE_INTEGER })
+    }
+    editor.focus()
+  }
 
   return (
     <Editor

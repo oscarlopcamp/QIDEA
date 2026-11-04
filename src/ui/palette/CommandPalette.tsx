@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { basename } from '@/core/fs/paths'
+import { isInternalPath } from '@/core/model/runs'
 import { host, useContributions } from '@/extensions'
 import { formatKeybinding } from '@/extensions/keybindings'
 import { fuzzyScore, usePalette } from '@/stores/palette'
@@ -22,7 +23,7 @@ export function CommandPalette() {
   const commands = useContributions('commands')
   const entries = useWorkspace((s) => s.entries)
   const [query, setQuery] = useState('')
-  const [index, setIndex] = useState(0)
+  const [rawIndex, setIndex] = useState(0)
   const input = useRef<HTMLInputElement>(null)
   const list = useRef<HTMLUListElement>(null)
 
@@ -66,7 +67,7 @@ export function CommandPalette() {
         })
     } else {
       all = Object.values(entries)
-        .filter((e) => e.kind === 'file')
+        .filter((e) => e.kind === 'file' && !isInternalPath(e.path))
         .map((e) => ({
           key: e.path,
           label: basename(e.path),
@@ -86,6 +87,9 @@ export function CommandPalette() {
       .map((x) => x.r)
   }, [effective, pick, commands, entries, text, t, close])
 
+  // Clamp: a hover (even Chrome's synthetic mousemove under a still pointer) can point past
+  // the end of a list that has just been filtered down.
+  const index = Math.max(0, Math.min(rawIndex, rows.length - 1))
   useEffect(() => setIndex(0), [text, effective])
 
   // Escape must close the palette even before the input has received focus.
@@ -157,7 +161,7 @@ export function CommandPalette() {
               data-index={i}
               role="option"
               aria-selected={i === index}
-              onMouseMove={() => setIndex(i)}
+              onMouseMove={(e) => (e.movementX || e.movementY) && setIndex(i)}
               onClick={() => r.run()}
               className={`mx-1 flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-1.5 text-[13.5px] ${
                 i === index ? 'bg-surface-2 text-text' : 'text-text'

@@ -3,6 +3,10 @@ import { LoaderCircle, Play, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { basename } from '@/core/fs/paths'
 import { useRuntime } from '@/stores/runtime'
+import { useRuns } from '@/stores/runs'
+import { useUi } from '@/stores/ui'
+import { ManagerBoard } from '@/ui/manager/ManagerBoard'
+import { ModeSwitch } from '@/ui/manager/ModeSwitch'
 import { useWorkspace } from '@/stores/workspace'
 import { WelcomeView } from '@/ui/shell/WelcomeView'
 import { FileIcon } from '@/ui/explorer/FileIcon'
@@ -11,18 +15,21 @@ const CodeEditor = lazy(() => import('./CodeEditor'))
 
 export function EditorArea() {
   const { t } = useTranslation()
-  const { project, tabs, active, openFile, closeTab, runFile } = useWorkspace()
+  const { project, tabs, active, openFile, closeTab } = useWorkspace()
+  const runFile = useRuns((s) => s.runFile)
+  const mode = useUi((s) => s.mode)
   const phase = useRuntime((s) => s.phase)
 
-  if (!project || !active) return <WelcomeView />
+  if (!project) return <WelcomeView />
 
   const busy = phase === 'loading' || phase === 'running'
-  const canRun = active.endsWith('.py')
+  const canRun = mode === 'code' && !!active?.endsWith('.py')
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-9 shrink-0 items-stretch border-b border-line bg-surface">
-        <div role="tablist" aria-label={t('editor.openFiles')} className="flex min-w-0 flex-1 overflow-x-auto">
+        <ModeSwitch />
+        <div role="tablist" aria-label={t('editor.openFiles')} className="flex min-w-0 flex-1 overflow-x-auto" hidden={mode !== 'code'}>
           {tabs.map((p) => {
             const selected = p === active
             return (
@@ -58,6 +65,7 @@ export function EditorArea() {
             )
           })}
         </div>
+        {mode !== 'code' && <div className="flex-1" />}
         {canRun && (
           <button
             type="button"
@@ -72,11 +80,17 @@ export function EditorArea() {
         )}
       </div>
       <div className="min-h-0 flex-1">
-        <Suspense
-          fallback={<div className="grid h-full place-items-center text-[13px] text-muted">{t('editor.loading')}</div>}
-        >
-          <CodeEditor path={active} />
-        </Suspense>
+        {mode === 'manager' ? (
+          <ManagerBoard />
+        ) : active ? (
+          <Suspense
+            fallback={<div className="grid h-full place-items-center text-[13px] text-muted">{t('editor.loading')}</div>}
+          >
+            <CodeEditor path={active} />
+          </Suspense>
+        ) : (
+          <div className="grid h-full place-items-center px-6 text-center text-[13px] text-muted">{t('editor.noFile')}</div>
+        )}
       </div>
     </div>
   )

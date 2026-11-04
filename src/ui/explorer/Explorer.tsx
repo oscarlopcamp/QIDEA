@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { buildTree, dirname, type TreeNode } from '@/core/fs/paths'
 import { MANIFEST_PATH, parseManifest, type LaneId } from '@/core/model/project'
+import { isInternalPath } from '@/core/model/runs'
 import { useUi } from '@/stores/ui'
 import { useWorkspace, type FsError } from '@/stores/workspace'
 import { Dialog, btnDanger, btnSecondary } from '@/ui/common/Dialog'
@@ -40,7 +41,7 @@ export function Explorer() {
 
   const request = useUi((s) => s.explorerRequest)
 
-  const tree = useMemo(() => buildTree(Object.values(ws.entries)), [ws.entries])
+  const tree = useMemo(() => buildTree(Object.values(ws.entries).filter((e) => !isInternalPath(e.path))), [ws.entries])
   const laneOf = useMemo(() => {
     const lanes = parseManifest(ws.entries[MANIFEST_PATH]?.content)?.lanes ?? {}
     const map = new Map<string, LaneId>()

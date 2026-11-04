@@ -8,7 +8,7 @@
   },
   "sidebar": {
     "explorerEmpty": "No project is open. Create a hybrid project or import one from a zip file.",
-    "managerEmpty": "The project manager shows every stage of your hybrid project across the classical, quantum and integration lanes.",
+    "managerEmpty": "Open a project to manage it across lifecycle stages and the classical, quantum and integration lanes.",
     "learnEmpty": "Lessons on qubits, entanglement and hybrid algorithms will appear here.",
     "lifecycleEmpty": "Run tests, validate results and package your project for deployment.",
     "extensionsEmpty": "Built-in extensions: simulator, Python runtime, lessons and methodology templates."
@@ -35,7 +35,8 @@
     "loadingRuntime": "Loading Qiskit…",
     "clear": "Clear output",
     "tabs": "Panel",
-    "results": "Results"
+    "results": "Results",
+    "history": "History"
   },
   "status": {
     "runtime": "Qiskit version",
@@ -44,11 +45,16 @@
     "ready": "ready",
     "themeToDark": "Switch to dark theme",
     "themeToLight": "Switch to light theme",
-    "noBackend": "No backend"
+    "noBackend": "No backend",
+    "locked": "locked",
+    "lockedTitle": "qidea.lock pins this project to Qiskit {{version}}",
+    "lockMismatch": "lock: {{version}}",
+    "lockMismatchTitle": "qidea.lock pins Qiskit {{version}}; running will ask which version to use"
   },
   "common": {
     "cancel": "Cancel",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "close": "Close"
   },
   "lanes": {
     "classical": "Classical",
@@ -101,7 +107,8 @@
     "run": "Run",
     "running": "Running…",
     "runHint": "Run this file (Ctrl/Cmd + Enter)",
-    "loading": "Loading editor…"
+    "loading": "Loading editor…",
+    "noFile": "Open a file from the explorer, or switch to Manager to see the project board."
   },
   "palette": {
     "commandsPlaceholder": "Type a command",
@@ -133,7 +140,12 @@
     "closeTab": "Close editor tab",
     "selectQiskitVersion": "Select Qiskit version",
     "runQiskitCheck": "Run Qiskit check",
-    "clearOutput": "Clear output"
+    "clearOutput": "Clear output",
+    "showRunHistory": "Show run history",
+    "reproduceLastRun": "Reproduce the latest run",
+    "showManager": "Show project manager",
+    "showCode": "Show code",
+    "changeMethodology": "Change methodology"
   },
   "extensions": {
     "lead_one": "{{count}} extension installed. Every QIDEA feature is built as an extension.",
@@ -161,6 +173,10 @@
     "generic": {
       "title": "Generic lifecycle",
       "description": "Eight stages that fit any methodology."
+    },
+    "vModel": {
+      "title": "V-model",
+      "description": "Each design stage is paired with a matching test stage."
     }
   },
   "stages": {
@@ -214,5 +230,117 @@
     "histogramSummary_one": "Histogram of {{shots}} shots over {{count}} outcome. Most frequent: {{top}}.",
     "histogramSummary_other": "Histogram of {{shots}} shots over {{count}} outcomes. Most frequent: {{top}}.",
     "circuitSummary": "Circuit diagram with {{qubits}} qubits and {{ops}} operations."
+  },
+  "history": {
+    "noProject": "Open a project to see its run history.",
+    "empty": "No runs yet. Run a Python file and it is recorded here, with the exact versions it used.",
+    "list": "Runs",
+    "detail": "Run details",
+    "reproduction": "reproduction",
+    "failed": "Failed",
+    "succeeded": "Succeeded",
+    "identical": "Reproduced identically",
+    "differs": "Reproduced with different results",
+    "duration": "{{ms}} ms",
+    "openFile": "Open file",
+    "reproduce": "Reproduce this run",
+    "reproduceHint": "Run the same code again with Qiskit {{version}} and the same versions as this run",
+    "identicalNote": "Reproduction of the run from {{when}}: same output and results.",
+    "differsNote": "Reproduction of the run from {{when}}: the results differ. Pass seed= to random parts of your code to make runs repeatable.",
+    "noSnapshot": "No code snapshot was stored (the project was larger than 512 KB)."
+  },
+  "mode": {
+    "label": "Project mode",
+    "code": "Code",
+    "manager": "Manager"
+  },
+  "vmodel": {
+    "requirements": {
+      "title": "Requirements",
+      "description": "What the system must do; paired with acceptance testing."
+    },
+    "systemDesign": {
+      "title": "System design",
+      "description": "Split the system into classical and quantum parts; paired with system testing."
+    },
+    "architecture": {
+      "title": "Architecture",
+      "description": "Interfaces between components and backends; paired with integration testing."
+    },
+    "moduleDesign": {
+      "title": "Module design",
+      "description": "Each circuit and module in detail; paired with unit testing."
+    },
+    "implementation": {
+      "title": "Implementation",
+      "description": "Write the code and the circuits."
+    },
+    "unitTesting": {
+      "title": "Unit testing",
+      "description": "Test each module and circuit on its own."
+    },
+    "integrationTesting": {
+      "title": "Integration testing",
+      "description": "Test how classical and quantum parts work together."
+    },
+    "systemTesting": {
+      "title": "System testing",
+      "description": "Test the whole hybrid system."
+    },
+    "acceptanceTesting": {
+      "title": "Acceptance testing",
+      "description": "Confirm the requirements are met."
+    }
+  },
+  "manager": {
+    "board": "Project board",
+    "methodology": "Methodology",
+    "pickMethodology": "Choose the lifecycle methodology for this project",
+    "progress": "Progress by lane",
+    "laneProgress": "{{lane}} progress",
+    "doneOf": "{{done}}/{{total}} done",
+    "filter": "Filter by status",
+    "allStatuses": "All",
+    "status": {
+      "todo": "To do",
+      "doing": "In progress",
+      "review": "In review",
+      "done": "Done"
+    },
+    "links_one": "{{count}} file",
+    "links_other": "{{count}} files",
+    "openCode": "Open code",
+    "openCodeTitle": "Open {{path}} in the editor",
+    "unassigned": "Unassigned",
+    "unassignedDesc": "Items from a stage this methodology doesn't have. Drag them into a stage.",
+    "emptyHint": "This board is empty. Hover a cell and choose Add to create the first task of a stage and lane.",
+    "add": "Add",
+    "addItemIn": "Add a task to the {{lane}} lane",
+    "newItemTitle": "New task title",
+    "newItemPlaceholder": "Task title, then Enter",
+    "detail": "Task",
+    "title": "Title",
+    "statusLabel": "Status",
+    "stage": "Stage",
+    "lane": "Lane",
+    "description": "Description",
+    "descriptionPlaceholder": "What needs to happen, and how you will know it is done",
+    "code": "Linked code",
+    "line": "Line number",
+    "lineShort": "line",
+    "linkFile": "Link a file",
+    "pickFile": "Choose a project file to link",
+    "removeLink": "Remove link to {{path}}",
+    "deleteItem": "Delete task",
+    "deleteTitle": "Delete “{{title}}”?",
+    "deleteBody": "The task is removed from the board. Linked files are not changed.",
+    "openBoard": "Open the board",
+    "lanesHeading": "Lanes",
+    "stagesHeading": "Stages",
+    "laneHint": {
+      "classical": "Traditional software",
+      "quantum": "Circuits and algorithms",
+      "integration": "Interfaces and orchestration"
+    }
   }
 }

@@ -31,7 +31,7 @@ await page.goto(url)
 // Extensions view lists all built-ins, all active.
 await page.getByRole('button', { name: 'Extensions' }).click()
 const lead = await page.getByText(/extensions installed/).innerText()
-check('extensions view lists built-ins', /^9 extensions installed/.test(lead), lead)
+check('extensions view lists built-ins', /^10 extensions installed/.test(lead), lead)
 check('no extension failed', !(await page.getByLabel('Failed to activate').count()))
 if (shots) await page.screenshot({ path: `${shots}/ext-view.png` })
 

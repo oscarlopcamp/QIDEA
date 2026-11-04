@@ -13,7 +13,8 @@ export function instantiateTemplate(id: string, vars: Record<string, string>): F
   const folders = new Set<string>()
   for (const [key, text] of Object.entries(raw)) {
     if (!key.startsWith(prefix)) continue
-    const path = key.slice(prefix.length)
+    // Bundlers skip dot-folders, so templates store ".qidea/" as "_qidea/".
+    const path = key.slice(prefix.length).replace(/^_qidea\//, '.qidea/')
     const content = text.replace(/\{\{(\w+)\}\}/g, (m, k: string) => vars[k] ?? m)
     files.push({ path, kind: 'file', content })
     const parts = path.split('/')

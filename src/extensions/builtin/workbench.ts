@@ -1,6 +1,7 @@
 import { Blocks, Files } from 'lucide-react'
 import type { QideaExtension } from '@/extensions/api'
 import { usePalette } from '@/stores/palette'
+import { useRuns } from '@/stores/runs'
 import { useUi } from '@/stores/ui'
 import { useWorkspace } from '@/stores/workspace'
 import { Explorer } from '@/ui/explorer/Explorer'
@@ -156,7 +157,7 @@ export const workbenchExtension: QideaExtension = {
       category: 'commands.categoryRun',
       keybinding: 'mod+enter',
       when: () => useWorkspace.getState().active?.endsWith('.py') ?? false,
-      run: () => useWorkspace.getState().runFile(),
+      run: () => useRuns.getState().runFile(),
     })
     cmd({
       id: 'qidea.file.closeTab',

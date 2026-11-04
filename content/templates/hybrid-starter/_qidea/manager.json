@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "methodologyId": "generic",
+  "items": [
+    {
+      "id": "req-goal",
+      "stageId": "requirements",
+      "lane": "integration",
+      "title": "Goal: ground-state energy of H₂ within 10⁻³",
+      "description": "The system must estimate the lowest energy of the two-qubit H₂ Hamiltonian, accurate to 0.001 Hartree, compared with exact diagonalisation.",
+      "status": "done",
+      "links": [
+        {
+          "path": "README.md"
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "req-encoding",
+      "stageId": "requirements",
+      "lane": "quantum",
+      "title": "Fit the problem on 2 qubits",
+      "description": "Use a reduced two-qubit encoding of H₂ so the circuit runs on any simulator and small hardware.",
+      "status": "done",
+      "links": [
+        {
+          "path": "quantum/hamiltonian.py",
+          "line": 6
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ana-optimiser",
+      "stageId": "analysis",
+      "lane": "classical",
+      "title": "Choose a gradient-free optimiser",
+      "description": "Estimating gradients on quantum hardware is expensive, so the classical side uses COBYLA, which only needs energy values.",
+      "status": "done",
+      "links": [
+        {
+          "path": "classical/optimizer.py",
+          "line": 6
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ana-hamiltonian",
+      "stageId": "analysis",
+      "lane": "quantum",
+      "title": "Write the Hamiltonian as Pauli terms",
+      "description": "Express H₂ as a weighted sum of Pauli strings (II, IZ, ZI, ZZ, XX) that an estimator can measure.",
+      "status": "done",
+      "links": [
+        {
+          "path": "quantum/hamiltonian.py",
+          "line": 6
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "des-ansatz",
+      "stageId": "design",
+      "lane": "quantum",
+      "title": "Ansatz: RY layers with one CX",
+      "description": "A hardware-efficient ansatz: one layer of RY rotations, an entangling CX, then a second RY layer. Four parameters.",
+      "status": "done",
+      "links": [
+        {
+          "path": "quantum/ansatz.py",
+          "line": 7
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "des-bridge",
+      "stageId": "design",
+      "lane": "integration",
+      "title": "Interface: energy(params) → float",
+      "description": "The single contract between both sides: the optimiser proposes parameters, the quantum side returns an energy.",
+      "status": "done",
+      "links": [
+        {
+          "path": "integration/main.py",
+          "line": 16
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "impl-cobyla",
+      "stageId": "implementation",
+      "lane": "classical",
+      "title": "Optimiser wrapper",
+      "description": "minimize_energy(cost, x0) wraps scipy's COBYLA. It knows nothing about quantum computing.",
+      "status": "done",
+      "links": [
+        {
+          "path": "classical/optimizer.py",
+          "line": 6
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "impl-ansatz",
+      "stageId": "implementation",
+      "lane": "quantum",
+      "title": "Ansatz builder",
+      "description": "build_ansatz(n) returns the parameterised circuit.",
+      "status": "done",
+      "links": [
+        {
+          "path": "quantum/ansatz.py",
+          "line": 7
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "impl-loop",
+      "stageId": "implementation",
+      "lane": "integration",
+      "title": "VQE loop",
+      "description": "Connect the estimator, the ansatz and the optimiser, and record the energy history.",
+      "status": "doing",
+      "links": [
+        {
+          "path": "integration/main.py",
+          "line": 26
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-bell",
+      "stageId": "testing",
+      "lane": "quantum",
+      "title": "Sanity check: Bell state",
+      "description": "Run quantum/bell.py: the simulator must return only 00 and 11, roughly half each.",
+      "status": "review",
+      "links": [
+        {
+          "path": "quantum/bell.py",
+          "line": 15
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-exact",
+      "stageId": "testing",
+      "lane": "integration",
+      "title": "Compare with exact diagonalisation",
+      "description": "The VQE energy must be within 10⁻³ of numpy's lowest eigenvalue.",
+      "status": "todo",
+      "links": [
+        {
+          "path": "integration/main.py",
+          "line": 28
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "val-state",
+      "stageId": "validation",
+      "lane": "integration",
+      "title": "Check the optimised state",
+      "description": "Measure the optimised circuit and confirm the distribution concentrates on the expected basis state.",
+      "status": "todo",
+      "links": [
+        {
+          "path": "integration/main.py",
+          "line": 35
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "val-seeds",
+      "stageId": "validation",
+      "lane": "classical",
+      "title": "Results are repeatable",
+      "description": "Seeds are fixed, so “Reproduce this run” in the History tab must give identical results.",
+      "status": "todo",
+      "links": [
+        {
+          "path": "integration/main.py",
+          "line": 37
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "dep-backend",
+      "stageId": "deployment",
+      "lane": "quantum",
+      "title": "Choose where the circuit runs",
+      "description": "Today: QIDEA's local simulator. Later: real hardware behind the same backend.run() interface.",
+      "status": "todo",
+      "links": [
+        {
+          "path": "integration/main.py",
+          "line": 37
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "dep-package",
+      "stageId": "deployment",
+      "lane": "classical",
+      "title": "Package the project",
+      "description": "Export the project as a zip with qidea.lock so anyone can run it with the same versions.",
+      "status": "todo",
+      "links": [],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "mnt-lock",
+      "stageId": "maintenance",
+      "lane": "integration",
+      "title": "Keep runtimes up to date",
+      "description": "When a new Qiskit version is available, run once with it, compare results, then update qidea.lock.",
+      "status": "todo",
+      "links": [
+        {
+          "path": "qidea.json"
+        }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}

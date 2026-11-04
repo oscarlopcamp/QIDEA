@@ -1,6 +1,7 @@
 import type { QideaExtension } from '@/extensions/api'
 import { languagesExtension } from './languages'
 import { genericMethodologyExtension } from './methodologyGeneric'
+import { vModelMethodologyExtension } from './methodologyVModel'
 import { learnExtension, lifecycleExtension, projectManagerExtension } from './plannedModules'
 import { pythonRuntimeExtension } from './pythonRuntime'
 import { simulatorExtension } from './simulator'
@@ -15,6 +16,7 @@ export const BUILTIN_EXTENSIONS: QideaExtension[] = [
   simulatorExtension,
   templatesExtension,
   genericMethodologyExtension,
+  vModelMethodologyExtension,
   projectManagerExtension,
   learnExtension,
   lifecycleExtension,

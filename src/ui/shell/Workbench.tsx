@@ -52,7 +52,7 @@ export function Workbench() {
   const panelTab = useRuntime((s) => s.panelTab)
   useEffect(() => {
     const p = panelRef.current
-    if (panelTab !== 'results' || !p) return
+    if (panelTab === 'output' || !p) return
     if (p.isCollapsed()) p.expand()
     if (p.getSize().inPixels < 360) p.resize(380)
   }, [panelTab, panelRef])
